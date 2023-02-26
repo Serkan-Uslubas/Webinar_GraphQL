@@ -21,7 +21,235 @@ https://github.com/Serkan-Uslubas/Webinar_GraphQL
 
 
 
+# Session 1: Create a GraphQL Backend Application using Hot Chocolate Framework
+
+## Preparations
+
+**Step 1:**  Copy folder "Webinar_GraphQL\01-Start" as "Webinar_GraphQL\02-Start"
+
+**Step 2:**  Open DF.Webinar.GrahpQL.Backend.sln Solution with Visual Studio.
 
 
+## Create a new Project
+
+**Step 1:**  Open Visual Studio and create a new .NET Core web application project.
+
+**Step 2:**  Choose the API project template and click on the Create button.
+
+**Step 3:**  Install the required NuGet packages. 
+
+For that, you can use the NuGet Package Manager or the Package Manager Console. The required packages are:
+
+```c#
+Install-Package HotChocolate.AspNetCore
+Install-Package HotChocolate.AspNetCore.Playground
+Install-Package HotChocolate.Types
+Install-Package HotChocolate.Types.Extensions
+```
+
+## Create the Query Type
 
 
+**Step 1:**  Create a new folder named "Queries" under the project root. 
+  
+  This folder will contain all the GraphQL queries for your application.
+
+**Step 2:**  Create a new file named "BookQueries.cs" under the Queries folder. 
+  
+  This file will contain the GraphQL queries for the Book and Author entity.
+
+**Step 3:**  Add the following code to the BookQueries.cs file:
+
+```csharp
+
+using System.Collections.Generic;
+using System.Linq;
+using YourProjectNamespace.Models;
+using HotChocolate;
+using HotChocolate.Data;
+using HotChocolate.Types;
+
+namespace YourProjectNamespace.Queries
+{
+    public class BookQueries
+    {
+        [UseDbContext(typeof(AppDbContext))]
+        [UseFiltering]
+        [UseSorting]
+        public IQueryable<Book> GetBooks([ScopedService] AppDbContext context) => context.Books;
+
+        [UseDbContext(typeof(AppDbContext))]
+        public Book GetBookById(int id, [ScopedService] AppDbContext context) => context.Books.Find(id);
+
+        [UseDbContext(typeof(AppDbContext))]
+        public List<Book> GetBooksByAuthorId(int authorId, [ScopedService] AppDbContext context) => context.Books.Where(b => b.AuthorId == authorId).ToList();
+    }
+}
+
+```
+
+This code defines three GraphQL queries for the Book entity: GetBooks, GetBookById, and GetBooksByAuthorId. 
+1. The **GetBooks** query retrieves all the books in the database and applies filtering and sorting  based on the GraphQL query arguments. 
+2. The **GetBookById** query retrieves a book with a specific id. 
+3. The **GetBooksByAuthorId** query retrieves all the books written by a specific author.
+
+## Create the Mutation Type
+**Step 1:**  Create a new folder named "Mutations" under the project root. 
+  
+  This folder will contain all the GraphQL mutations for your application.
+
+**Step 2:**  Create a new file named "BookMutations.cs" under the Mutations folder. 
+  
+  This file will contain the GraphQL mutations for the Book entity.
+
+**Step 3:**  Add the following code to the BookMutations.cs file:
+
+```csharp
+using System.Threading.Tasks;
+using YourProjectNamespace.Models;
+using HotChocolate;
+using HotChocolate.Data;
+using HotChocolate.Types;
+
+namespace YourProjectNamespace.Mutations
+{
+    public class BookMutations
+    {
+        [UseDbContext(typeof(AppDbContext))]
+        public async Task<Book> AddBookAsync(Book book, [ScopedService] AppDbContext context)
+        {
+            await context.Books.AddAsync(book);
+            await context.SaveChangesAsync();
+            return book;
+        }
+
+        [UseDbContext(typeof(AppDbContext))]
+        public async Task<Book> UpdateBookAsync(int id, Book book, [ScopedService] AppDbContext context)
+        {
+            var oldBook = context.Books.Find(id);
+            if (oldBook == null)
+            {
+                throw new GraphQLException("Book not found");
+            }
+
+            oldBook.YearOfPublication = book.YearOfPublication;
+            oldBook.ArticleNumber = book.ArticleNumber;
+            oldBook.Title = book.Title;
+            oldBook.Description = book.Description;
+            oldBook.Isbn = book.Isbn;
+            oldBook.Language = book.Language;
+            oldBook.Pages = book.Pages;
+            oldBook.Price = book.Price;
+            oldBook.AuthorId = book.AuthorId;
+
+            await context.SaveChangesAsync();
+            return oldBook;
+        }
+
+        [UseDbContext(typeof(AppDbContext))]
+        public async Task<Book> DeleteBookAsync(int id, [ScopedService] AppDbContext context)
+        {
+            var book = context.Books.Find(id);
+            if (book == null)
+            {
+                throw new GraphQLException("Book not found");
+            }
+
+            context.Books.Remove(book);
+            await context.SaveChangesAsync();
+            return book;
+        }
+    }
+}
+
+```
+
+This code defines three GraphQL mutations for the Book entity: AddBookAsync, UpdateBookAsync, and DeleteBookAsync. 
+1. The **AddBookAsync** mutation adds a new book to the database. 
+2. The **UpdateBookAsync** mutation updates an existing book in the database. 
+3. The **DeleteBookAsync** mutation deletes an existing book from the database.
+
+
+## Configure Startup.cs
+
+
+**Step 1:** In your .NET project, open the Startup.cs file.
+
+**Step 2:** Add the following using statements at the top of the file:
+
+```c#
+using YourProjectNamespace.Data;
+using YourProjectNamespace.Models;
+using YourProjectNamespace.Queries;
+using YourProjectNamespace.Mutations;
+using HotChocolate.AspNetCore;
+using HotChocolate.AspNetCore.Playground;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+```
+This will include the necessary dependencies for configuring the GraphQL application.
+
+**Step 3:** In the ConfigureServices method, add the following code:
+
+```c#
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+    services.AddControllers();
+    services.AddGraphQLServer()
+            .AddQueryType<Query>()
+            .AddMutationType<Mutation>()
+            .AddType<BookType>()
+            .AddType<AuthorType>()
+            .AddFiltering()
+            .AddSorting();
+}
+```
+
+This code adds the following services to the dependency injection container:
+
+- DbContext for the AppDbContext class, using the default connection string from the appsettings.json file.
+- Controllers for handling HTTP requests.
+- GraphQL server using the AddGraphQLServer extension method.
+- Query type using the Query class.
+- Mutation type using the Mutation class.
+- GraphQL types for the Book and Author entities using the BookType and AuthorType classes.
+- Filtering and sorting capabilities using the AddFiltering and AddSorting methods.
+
+**Step 4:** In the Configure method, add the following code:
+```c#
+
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    if (env.IsDevelopment())
+    {
+        app.UseDeveloperExceptionPage();
+        app.UsePlayground();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseRouting();
+    app.UseAuthorization();
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+        endpoints.MapGraphQL();
+    });
+}
+
+
+```
+This code configures the middleware pipeline for the application:
+
+- Developer exception page and Playground for the development environment.
+- HTTPS redirection, routing, and authorization middleware.
+- Controllers and GraphQL endpoints.
+
+**Step 5:** Save the Startup.cs file.
+
+That's it! You have now configured the Startup.cs file for a GraphQL application using the Hot Chocolate framework. You can now run the application and test the GraphQL queries and mutations using a client such as GraphQL Playground or GraphiQL.
