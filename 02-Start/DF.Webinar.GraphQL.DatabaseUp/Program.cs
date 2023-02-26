@@ -8,7 +8,7 @@ string ConnectionString = "Server=(localdb)\\mssqllocaldb;Database=graphqldb-loc
 using IHost host = Host.CreateDefaultBuilder(args)
 .ConfigureServices(services =>
 {
-    services.AddDbContextFactory<DfContext>(opt =>
+    services.AddDbContextFactory<AppDbContext>(opt =>
     {
         opt.UseSqlServer(ConnectionString);
         opt.EnableSensitiveDataLogging();

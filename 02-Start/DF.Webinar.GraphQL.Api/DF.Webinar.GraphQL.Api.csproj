@@ -7,13 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="13.0.5" />
+    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="10.5.5" />
+    <PackageReference Include="HotChocolate.AspNetCore.Voyager" Version="10.5.5" />
+    <PackageReference Include="HotChocolate.Data" Version="13.0.5" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="13.0.5" />
+    <PackageReference Include="HotChocolate.Types" Version="13.0.5" />
+    <PackageReference Include="HotChocolate.Types.Analyzers" Version="13.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\01-Start\DF.Webinar.GraphQL.Database\DF.Webinar.GraphQL.Database.csproj" />
-    <ProjectReference Include="..\..\01-Start\DF.Webinar.GraphQL.Models\DF.Webinar.GraphQL.Models.csproj" />
+    <ProjectReference Include="..\DF.Webinar.GraphQL.Database\DF.Webinar.GraphQL.Database.csproj" />
+    <ProjectReference Include="..\DF.Webinar.GraphQL.Models\DF.Webinar.GraphQL.Models.csproj" />
   </ItemGroup>
 
 </Project>

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DF.Webinar.GraphQL.Database.Migrations
 {
-    [DbContext(typeof(DfContext))]
+    [DbContext(typeof(AppDbContext))]
     partial class DfContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
