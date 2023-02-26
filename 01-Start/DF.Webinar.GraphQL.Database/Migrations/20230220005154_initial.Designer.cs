@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DF.Webinar.GraphQL.Database.Migrations
 {
-    [DbContext(typeof(DfContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20230220005154_initial")]
     partial class initial
     {

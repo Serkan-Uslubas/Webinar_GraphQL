@@ -32,11 +32,18 @@ https://github.com/Serkan-Uslubas/Webinar_GraphQL
 
 ## Create a new Project
 
-**Step 1:**  Open Visual Studio and create a new .NET Core web application project.
+**Step 1:**  Create a new ASP.NET Core Web API project.
 
-**Step 2:**  Choose the API project template and click on the Create button.
+**Step 2:**  Set the Project name as "DF.Webinar.GraphQL.Api" and click on the Next button.
 
-**Step 3:**  Install the required NuGet packages. 
+**Step 3:**  Choose .NET 7.0 and click on the Create button.
+
+**Step 4:** Add "DF.Webinar.GraphQL.Models" and "DF.Webinar.GraphQL.Database" as Project Reference.
+
+**Step 5:** Delete Controllers folder and WeatherForecast.cs file
+
+
+**Step 5:**  Install the required NuGet packages. 
 
 For that, you can use the NuGet Package Manager or the Package Manager Console. The required packages are:
 
@@ -44,7 +51,13 @@ For that, you can use the NuGet Package Manager or the Package Manager Console. 
 Install-Package HotChocolate.AspNetCore
 Install-Package HotChocolate.AspNetCore.Playground
 Install-Package HotChocolate.Types
-Install-Package HotChocolate.Types.Extensions
+Install-Package HotChocolate.AspNetCore.Voyager
+Install-Package HotChocolate.Data
+Install-Package HotChocolate.Data.EntityFramework
+Install-Package HotChocolate.Types.Analyzers
+Install-Package Microsoft.EntityFrameworkCore
+Install-Package Microsoft.EntityFrameworkCore.SqlServer
+Install-Package Microsoft.EntityFrameworkCore.Tools
 ```
 
 ## Create the Query Type
@@ -62,36 +75,37 @@ Install-Package HotChocolate.Types.Extensions
 
 ```csharp
 
-using System.Collections.Generic;
-using System.Linq;
-using YourProjectNamespace.Models;
+using DF.Webinar.GraphQL.Database;
+using DF.Webinar.GraphQL.Models;
 using HotChocolate;
 using HotChocolate.Data;
 using HotChocolate.Types;
 
-namespace YourProjectNamespace.Queries
+namespace DF.Webinar.GraphQL.Api.Queries
 {
     public class BookQueries
     {
         [UseDbContext(typeof(AppDbContext))]
+        [UseOffsetPaging(IncludeTotalCount = true)]
+        [UseProjection]
         [UseFiltering]
         [UseSorting]
         public IQueryable<Book> GetBooks([ScopedService] AppDbContext context) => context.Books;
 
         [UseDbContext(typeof(AppDbContext))]
-        public Book GetBookById(int id, [ScopedService] AppDbContext context) => context.Books.Find(id);
-
+        [UseFirstOrDefault]
+        [UseProjection]
+        [UseFiltering]
         [UseDbContext(typeof(AppDbContext))]
-        public List<Book> GetBooksByAuthorId(int authorId, [ScopedService] AppDbContext context) => context.Books.Where(b => b.AuthorId == authorId).ToList();
+        public Book GetBookById(int id, [ScopedService] AppDbContext context) => context.Books.Find(id);
     }
 }
 
 ```
 
-This code defines three GraphQL queries for the Book entity: GetBooks, GetBookById, and GetBooksByAuthorId. 
+This code defines two GraphQL queries for the Book entity: GetBooks and GetBookById
 1. The **GetBooks** query retrieves all the books in the database and applies filtering and sorting  based on the GraphQL query arguments. 
 2. The **GetBookById** query retrieves a book with a specific id. 
-3. The **GetBooksByAuthorId** query retrieves all the books written by a specific author.
 
 ## Create the Mutation Type
 **Step 1:**  Create a new folder named "Mutations" under the project root. 
@@ -105,13 +119,12 @@ This code defines three GraphQL queries for the Book entity: GetBooks, GetBookBy
 **Step 3:**  Add the following code to the BookMutations.cs file:
 
 ```csharp
-using System.Threading.Tasks;
-using YourProjectNamespace.Models;
-using HotChocolate;
+using DF.Webinar.GraphQL.Database;
+using DF.Webinar.GraphQL.Models;
 using HotChocolate.Data;
-using HotChocolate.Types;
+using HotChocolate;
 
-namespace YourProjectNamespace.Mutations
+namespace DF.Webinar.GraphQL.Api.Mutations
 {
     public class BookMutations
     {
@@ -161,7 +174,6 @@ namespace YourProjectNamespace.Mutations
         }
     }
 }
-
 ```
 
 This code defines three GraphQL mutations for the Book entity: AddBookAsync, UpdateBookAsync, and DeleteBookAsync. 

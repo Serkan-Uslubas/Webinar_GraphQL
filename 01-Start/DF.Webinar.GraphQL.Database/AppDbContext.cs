@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DF.Webinar.GraphQL.Database
 {
-    public class DfContext : DbContext
+    public class AppDbContext : DbContext
     {
-        public DfContext(DbContextOptions options) : base(options)
+        public AppDbContext(DbContextOptions options) : base(options)
         {
         }
 
