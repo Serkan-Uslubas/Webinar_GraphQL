@@ -17,6 +17,16 @@ builder.Services.AddPooledDbContextFactory<AppDbContext>(opt => {
     opt.EnableSensitiveDataLogging();
 });
 
+
+builder.Services.AddCors(options => {
+    options.AddPolicy("DevCorsPolicy", builder => {
+        builder
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
+
 builder.Services
     .AddGraphQLServer()
     .RegisterDbContext<AppDbContext>(DbContextKind.Pooled)
@@ -33,6 +43,8 @@ builder.Services
 // Configure the HTTP request pipeline.
 
 var app = builder.Build();
+
+app.UseCors("DevCorsPolicy");
 
 app.MapGraphQL();
 

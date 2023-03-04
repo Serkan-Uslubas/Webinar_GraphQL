@@ -191,9 +191,10 @@ install-package StrawberryShake.Blazor
 
 <PackageReference Include="StrawberryShake.Blazor" Version="13.0.5" />
 
-
+cd .\DF.Webinar.GrahpQL.Frontend
 dotnet new tool-manifest
 
+dotnet-tools.json
 {
   "version": 1,
   "isRoot": true,
@@ -202,6 +203,8 @@ dotnet new tool-manifest
 
 
 dotnet tool install StrawberryShake.Tools 
+
+dotnet-tools.json
 
 {
   "version": 1,
@@ -215,3 +218,69 @@ dotnet tool install StrawberryShake.Tools
     }
   }
 }
+
+
+
+
+dotnet graphql init https://localhost:7250/graphql -n graphClient
+
+.graphqlrc.json
+schema.extensions.graphql
+schema.graphql
+
+GetBooks.graphql
+
+
+
+
+In Index.Razor
+
+@page "/"
+
+<PageTitle>Books</PageTitle>
+
+<UseGetBooks Context="result" Strategy="ExecutionStrategy.CacheFirst">
+    <ChildContent>
+        @if (result.Books?.Items is not null) 
+        {
+            @foreach(var book in result.Books.Items) 
+            {
+                <p>@book.Title</p>        
+            }
+        }
+    </ChildContent>
+    <LoadingContent>
+        Loading...
+    </LoadingContent>
+</UseGetBooks>
+
+
+_Imports.razor
+
+@using DF.Webinar.GrahpQL.Frontend.Components
+@using StrawberryShake;
+
+
+Programm.cs
+
+builder.Services
+    .AddgraphClient()
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://localhost:7250/graphql/"))
+    .ConfigureWebSocketClient(c => c.Uri = new Uri("wss://localhost:7250/graphql/"));
+
+
+
+
+    
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("DevCorsPolicy", builder =>
+	{
+		builder
+			.AllowAnyOrigin()
+			.AllowAnyMethod()
+			.AllowAnyHeader();
+	});
+});
+
+app.UseCors("DevCorsPolicy");
