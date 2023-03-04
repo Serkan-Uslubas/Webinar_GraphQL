@@ -25,9 +25,10 @@ https://github.com/Serkan-Uslubas/Webinar_GraphQL
 
 ## Preparations
 
-**Step 1:**  Copy folder "Webinar_GraphQL\01-Start" as "Webinar_GraphQL\02-Start"
 
-**Step 2:**  Open DF.Webinar.GrahpQL.Backend.sln Solution with Visual Studio.
+**Step 1:**  Copy the content of folder "Webinar_GraphQL\01-Start" into "Webinar_GraphQL\Demo"
+
+**Step 2:**  Open DF.Webinar.GrahpQL.Backend.sln Solution with Visual Studio in the "Webinar_GraphQL\Demo" folder.
 
 
 ## Create a new Project
