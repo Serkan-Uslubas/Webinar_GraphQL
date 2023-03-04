@@ -1,18 +1,19 @@
-using DF.Webinar.GraphQL.Api.Mutations;
 using DF.Webinar.GraphQL.Api.Queries;
 using DF.Webinar.GraphQL.Database;
-using HotChocolate.AspNetCore;
-using HotChocolate.AspNetCore.Voyager;
-using HotChocolate.Data;
 using HotChocolate.Types.Pagination;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string connectionString = "Server=(localdb)\\mssqllocaldb;Database=graphqldb-local;Trusted_Connection=Yes;";
-builder.Services.AddPooledDbContextFactory<AppDbContext>(opt =>
-{
-    opt.UseSqlServer(connectionString);
+// Add services to the container.
+
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .Build();
+
+builder.Services.AddPooledDbContextFactory<AppDbContext>(opt => {
+    opt.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
     opt.EnableSensitiveDataLogging();
 });
 
@@ -20,20 +21,19 @@ builder.Services
     .AddGraphQLServer()
     .RegisterDbContext<AppDbContext>(DbContextKind.Pooled)
     .AddQueryType<BookQueries>()
-    .AddMutationType<BookMutations>()
-    .SetPagingOptions(new PagingOptions
-        {
-            MaxPageSize = 100
-        })
+    .SetPagingOptions(new PagingOptions {
+        IncludeTotalCount = true,
+        DefaultPageSize = 10,
+        MaxPageSize = 10000
+    })
     .AddFiltering()
     .AddSorting()
     .AddProjections();
 
-var app = builder.Build();
+// Configure the HTTP request pipeline.
 
-app.UsePlayground()
-    .UseVoyager();
+var app = builder.Build();
 
 app.MapGraphQL();
 
-
+app.Run();
