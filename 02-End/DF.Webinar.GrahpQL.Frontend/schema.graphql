@@ -1,0 +1,166 @@
+﻿schema {
+  query: BookQueries
+}
+
+type BookQueries {
+  books(skip: Int take: Int where: BookFilterInput order: [BookSortInput!]): BooksCollectionSegment
+  bookById(id: Int! where: BookFilterInput): Book
+}
+
+input BookFilterInput {
+  and: [BookFilterInput!]
+  or: [BookFilterInput!]
+  id: IntOperationFilterInput
+  yearOfPublication: IntOperationFilterInput
+  articleNumber: StringOperationFilterInput
+  title: StringOperationFilterInput
+  description: StringOperationFilterInput
+  isbn: StringOperationFilterInput
+  language: StringOperationFilterInput
+  pages: IntOperationFilterInput
+  price: FloatOperationFilterInput
+  authorId: LongOperationFilterInput
+  author: AuthorFilterInput
+}
+
+input BookSortInput {
+  id: SortEnumType
+  yearOfPublication: SortEnumType
+  articleNumber: SortEnumType
+  title: SortEnumType
+  description: SortEnumType
+  isbn: SortEnumType
+  language: SortEnumType
+  pages: SortEnumType
+  price: SortEnumType
+  authorId: SortEnumType
+  author: AuthorSortInput
+}
+
+"A segment of a collection."
+type BooksCollectionSegment {
+  "Information to aid in pagination."
+  pageInfo: CollectionSegmentInfo!
+  "A flattened list of the items."
+  items: [Book!]
+  totalCount: Int!
+}
+
+input IntOperationFilterInput {
+  eq: Int
+  neq: Int
+  in: [Int]
+  nin: [Int]
+  gt: Int
+  ngt: Int
+  gte: Int
+  ngte: Int
+  lt: Int
+  nlt: Int
+  lte: Int
+  nlte: Int
+}
+
+input StringOperationFilterInput {
+  and: [StringOperationFilterInput!]
+  or: [StringOperationFilterInput!]
+  eq: String
+  neq: String
+  contains: String
+  ncontains: String
+  in: [String]
+  nin: [String]
+  startsWith: String
+  nstartsWith: String
+  endsWith: String
+  nendsWith: String
+}
+
+input FloatOperationFilterInput {
+  eq: Float
+  neq: Float
+  in: [Float]
+  nin: [Float]
+  gt: Float
+  ngt: Float
+  gte: Float
+  ngte: Float
+  lt: Float
+  nlt: Float
+  lte: Float
+  nlte: Float
+}
+
+input LongOperationFilterInput {
+  eq: Long
+  neq: Long
+  in: [Long]
+  nin: [Long]
+  gt: Long
+  ngt: Long
+  gte: Long
+  ngte: Long
+  lt: Long
+  nlt: Long
+  lte: Long
+  nlte: Long
+}
+
+input AuthorFilterInput {
+  and: [AuthorFilterInput!]
+  or: [AuthorFilterInput!]
+  id: IntOperationFilterInput
+  firstName: StringOperationFilterInput
+  lastName: StringOperationFilterInput
+  books: ListFilterInputTypeOfBookFilterInput
+}
+
+enum SortEnumType {
+  ASC
+  DESC
+}
+
+input AuthorSortInput {
+  id: SortEnumType
+  firstName: SortEnumType
+  lastName: SortEnumType
+}
+
+"Information about the offset pagination."
+type CollectionSegmentInfo {
+  "Indicates whether more items exist following the set defined by the clients arguments."
+  hasNextPage: Boolean!
+  "Indicates whether more items exist prior the set defined by the clients arguments."
+  hasPreviousPage: Boolean!
+}
+
+type Book {
+  id: Int!
+  yearOfPublication: Int
+  articleNumber: String
+  title: String
+  description: String
+  isbn: String
+  language: String
+  pages: Int
+  price: Float
+  authorId: Long
+  author: Author
+}
+
+"The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
+scalar Long
+
+input ListFilterInputTypeOfBookFilterInput {
+  all: BookFilterInput
+  none: BookFilterInput
+  some: BookFilterInput
+  any: Boolean
+}
+
+type Author {
+  id: Int!
+  firstName: String
+  lastName: String
+  books: [Book!]!
+}
