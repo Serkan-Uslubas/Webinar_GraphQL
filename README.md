@@ -181,3 +181,7 @@ app.MapGraphQL();
 app.Run();
 
 ```
+
+# Session 2: Create a Blazor Webassamybly Application wich Consumes GraphQL 
+
+
