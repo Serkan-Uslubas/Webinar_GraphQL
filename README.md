@@ -185,3 +185,33 @@ app.Run();
 # Session 2: Create a Blazor Webassamybly Application wich Consumes GraphQL 
 
 
+DF.Webinar.GrahpQL.Frontend
+
+install-package StrawberryShake.Blazor
+
+<PackageReference Include="StrawberryShake.Blazor" Version="13.0.5" />
+
+
+dotnet new tool-manifest
+
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {}
+}
+
+
+dotnet tool install StrawberryShake.Tools 
+
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "strawberryshake.tools": {
+      "version": "13.0.5",
+      "commands": [
+        "dotnet-graphql"
+      ]
+    }
+  }
+}
