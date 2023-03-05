@@ -1,18 +1,81 @@
 ﻿@page "/"
+@using MudBlazor
+@using System.Runtime.InteropServices;
+
+@inject graphClient graphQLClient;
 
 <PageTitle>Books</PageTitle>
 
-<UseGetBooks Context="result" Strategy="ExecutionStrategy.CacheFirst">
-    <ChildContent>
-        @if (result.Books?.Items is not null) 
-        {
-            @foreach(var book in result.Books.Items) 
-            {
-                <p>@book.Title</p>        
-            }
-        }
-    </ChildContent>
-    <LoadingContent>
-        Loading...
-    </LoadingContent>
-</UseGetBooks>
+        <MudTable 
+            ServerData="@(new Func<TableState, Task<TableData<IGetBooks_Books_Items>>>(ServerReload))"
+            Dense="true" 
+            Hover="true" 
+            Loading="@isLoading"
+            @ref="table">
+
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Books overview</MudText>
+                <MudSpacer />
+                <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortLabel="title_field" T="IGetBooks_Books_Items">Title</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="description_field" T="IGetBooks_Books_Items">Description</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Nr">@context.Title</MudTd>
+                <MudTd DataLabel="Sign">@context.Description</MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText>No matching records found</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <MudText>Loading...</MudText>
+            </LoadingContent>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+
+
+@code {
+    private bool isLoading = false;
+    //private IEnumerable<Element> Elements = new List<Element>();
+    private IEnumerable<IGetBooks_Books_Items> pagedData;
+    private MudTable<IGetBooks_Books_Items> table;
+
+    private int totalItems;
+    private string searchString = null;
+
+    // Filter Parameter
+    int skip = 0;
+    int take = 10;
+    BookFilterInput filter = new BookFilterInput();
+    BookSortInput sorter = new BookSortInput();
+
+    //protected override async Task OnInitializedAsync() {
+    //    //Elements = await httpClient.GetFromJsonAsync<List<Element>>("webapi/periodictable");
+    //}
+
+
+    /// <summary>
+    /// Here we simulate getting the paged, filtered and ordered data from the server
+    /// </summary>
+    private async Task<TableData<IGetBooks_Books_Items>> ServerReload(TableState state) {
+        isLoading = true;
+        
+        var result = await graphQLClient.GetBooks.ExecuteAsync(skip, take, filter, sorter);
+        var count = result.Data.Books?.TotalCount ?? 0;
+        pagedData = result.Data.Books?.Items;
+        return new TableData<IGetBooks_Books_Items>() { TotalItems = count, Items = pagedData };
+
+        
+        isLoading = false;
+    }
+
+    private void OnSearch(string text) {
+        searchString = text;
+        table.ReloadServerData();
+    }
+}

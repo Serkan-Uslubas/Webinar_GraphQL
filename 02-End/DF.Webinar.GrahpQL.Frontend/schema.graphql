@@ -3,8 +3,13 @@
 }
 
 type BookQueries {
-  books(skip: Int take: Int where: BookFilterInput order: [BookSortInput!]): BooksCollectionSegment
-  bookById(id: Int! where: BookFilterInput): Book
+  books(
+    skip: Int
+    take: Int
+    where: BookFilterInput
+    order: [BookSortInput!]
+  ): BooksCollectionSegment
+  bookById(id: Int!, where: BookFilterInput): Book
 }
 
 input BookFilterInput {
@@ -37,11 +42,18 @@ input BookSortInput {
   author: AuthorSortInput
 }
 
-"A segment of a collection."
+"""
+A segment of a collection.
+"""
 type BooksCollectionSegment {
-  "Information to aid in pagination."
+  """
+  Information to aid in pagination.
+  """
   pageInfo: CollectionSegmentInfo!
-  "A flattened list of the items."
+
+  """
+  A flattened list of the items.
+  """
   items: [Book!]
   totalCount: Int!
 }
@@ -126,11 +138,18 @@ input AuthorSortInput {
   lastName: SortEnumType
 }
 
-"Information about the offset pagination."
+"""
+Information about the offset pagination.
+"""
 type CollectionSegmentInfo {
-  "Indicates whether more items exist following the set defined by the clients arguments."
+  """
+  Indicates whether more items exist following the set defined by the clients arguments.
+  """
   hasNextPage: Boolean!
-  "Indicates whether more items exist prior the set defined by the clients arguments."
+
+  """
+  Indicates whether more items exist prior the set defined by the clients arguments.
+  """
   hasPreviousPage: Boolean!
 }
 
@@ -148,7 +167,9 @@ type Book {
   author: Author
 }
 
-"The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
+"""
+The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1.
+"""
 scalar Long
 
 input ListFilterInputTypeOfBookFilterInput {

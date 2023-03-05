@@ -284,3 +284,25 @@ builder.Services.AddCors(options =>
 });
 
 app.UseCors("DevCorsPolicy");
+
+
+## Add MudTable
+
+
+install-package MudBlazor
+
+
+@using MudBlazor
+
+index.html
+
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+<link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+
+<script src="_content/MudBlazor/MudBlazor.min.js"></script>
+
+
+--> Program.cs
+using MudBlazor.Services;
+
+builder.Services.AddMudServices();

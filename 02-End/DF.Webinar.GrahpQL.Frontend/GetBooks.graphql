@@ -1,7 +1,30 @@
-query GetBooks {
-  books {
+query GetBooks (
+  $skip : Int,
+  $take: Int,  
+  $filter : BookFilterInput,
+  $order: BookSortInput!
+  ) 
+  {
+  books (
+    skip: $skip,
+    take: $take
+    order: [$order]
+    where: $filter
+    
+    ) {
     items {
       title
+      description
+      price
+        author {
+            firstName
+            lastName
+        }
+    }
+    totalCount
+    pageInfo {
+      hasPreviousPage
+      hasNextPage
     }
   }
 }
