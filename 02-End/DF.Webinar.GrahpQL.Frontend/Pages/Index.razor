@@ -1,111 +1,114 @@
 ﻿@page "/"
 @using MudBlazor
 @using System.Runtime.InteropServices;
-
-@*@inject graphClient graphQLClient;*@
+@using Radzen.Blazor
+@using Radzen;
 
 <PageTitle>Books</PageTitle>
 
-
-<UseGetBooks 
-    Context="result" 
-    Strategy="ExecutionStrategy.CacheFirst"
-    Filter="@filter"
-    Order="@order"
-    Skip="@skip"
-    Take="@take">
+<UseGetBooks Context="result"
+             Strategy="ExecutionStrategy.CacheFirst"
+             Filter="@filter"
+             Order="@order"
+             Skip="@skip"
+             Take="@take">
 
     <ChildContent>
+        <RadzenDataGrid 
+            TItem="IGetBooks_Books_Items"
+            @ref="itemsGrid"
+            Data="result.Books?.Items"
 
-         <MudTable Items="result.Books?.Items"
-            Dense="true" 
-            Hover="true" 
-            Elevation="0">
+            IsLoading=@isLoading
+            
+            AllowSorting="true"
+            Sort="@OnSort"
 
-            <ToolBarContent>
-                <MudText Typo="Typo.h6">Books overview</MudText>
-                <MudSpacer />
-                <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start"
-                              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-            </ToolBarContent>
-@*            <HeaderContent>
-                <MudTh><MudTableSortLabel SortLabel="title_field" T="IGetBooks_Books_Items">Title</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="description_field" T="IGetBooks_Books_Items">Description</MudTableSortLabel></MudTh>
-            </HeaderContent>*@
-            <RowTemplate>
-                <MudTd DataLabel="Title">@context.Title</MudTd>
-                <MudTd DataLabel="Description">@context.Description</MudTd>
-            </RowTemplate>
-@*            <NoRecordsContent>
-                <MudText>No matching records found</MudText>
-            </NoRecordsContent>
-            <LoadingContent>
-                <MudText>Loading...</MudText>
-            </LoadingContent>
-            <PagerContent>
-                <MudTablePager />
-            </PagerContent>*@
-        </MudTable>
+            AllowFiltering="true"
+            AllowColumnResize="true"
+            FilterMode="FilterMode.Simple"
+            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+            LogicalFilterOperator="LogicalFilterOperator.And"
+            
+            AllowPaging="true"
+            Count="@count"
+            PageSizeOptions="new int[] { 10, 20, 50, 100 }"
+            ShowPagingSummary= "true"
+            PagingSummaryFormat= "Displaying page {0} of {1} (total {2} records)"
+            PageSizeChanged="@PageSizeChanged"
+            Page="@OnPage"
+            PagerPosition=PagerPosition.Bottom
+            PagerHorizontalAlign="HorizontalAlign.Center"
+
+
+            style="height: 650px"
+            ColumnWidth="200px">
+
+            <Columns>
+
+                <RadzenDataGridColumn 
+                    TItem="IGetBooks_Books_Items"
+                    Property="@nameof(IGetBooks_Books_Items.Title)"
+                    Title="@nameof(IGetBooks_Books_Items.Title)"
+                    Width="80px"/>
+
+                <RadzenDataGridColumn 
+                    TItem="IGetBooks_Books_Items"
+                    Property="@nameof(IGetBooks_Books_Items.Description)"
+                    Title="@nameof(IGetBooks_Books_Items.Description)"
+                    Width="160px" />
+
+                <RadzenDataGridColumn 
+                    TItem="IGetBooks_Books_Items"
+                    Property="@nameof(IGetBooks_Books_Items.Author.LastName)"
+                    Title="@nameof(IGetBooks_Books_Items.Author.LastName)"
+                    Width="80px"/>
+            </Columns>
+    </RadzenDataGrid>
 
     </ChildContent>
 
 </UseGetBooks>
 
-
-
 @code {
-//    private bool isLoading = false;
-//    //private IEnumerable<Element> Elements = new List<Element>();
-//    private IEnumerable<IGetBooks_Books_Items> pagedData;
-//    private MudTable<IGetBooks_Books_Items> table;
 
-//    private int totalItems;
-    private string searchString = null;
+    RadzenDataGrid<IGetBooks_Books_Items>? itemsGrid = new RadzenDataGrid<IGetBooks_Books_Items>();
 
-//    // Filter Parameter
+    int count = 13;
+    bool isLoading = false;
+
+    // Filter Parameter
     int skip = 0;
-    int take = 5;
+    int take = 10;
     BookFilterInput filter = new BookFilterInput();
     BookSortInput order = new BookSortInput();
 
+    async void OnSort<T>(DataGridColumnSortEventArgs<T> args) 
+    {
+        if (order.GetType().GetProperties().Select(x => x.Name).Contains(args.Column.Title)) 
+        {
+            if (args.SortOrder.Equals(SortOrder.Descending)) 
+            {
+                order.GetType().GetProperty(args.Column.Title).SetValue(order, SortEnumType.Desc, null);
+            }
+            else 
+            {
+                order.GetType().GetProperty(args.Column.Title).SetValue(order, SortEnumType.Asc, null);
+            }
+            await itemsGrid.FirstPage(true);
+        }
+    }
 
-//    private string[] titles = Array.Empty<string>();
-//    private IDisposable storeSession;
+    async void OnPage(PagerEventArgs args) 
+    {
+        skip = args.Skip;
+        take = args.Top;
+    }
 
-    //protected override async Task OnInitializedAsync() {
-    //    //Elements = await httpClient.GetFromJsonAsync<List<Element>>("webapi/periodictable");
-    //}
-
-
-    ///// <summary>
-    ///// Here we simulate getting the paged, filtered and ordered data from the server
-    ///// </summary>
-    //private async Task<TableData<IGetBooks_Books_Items>> ServerReload(TableState state) {
-    //    isLoading = true;
-        
-    //    storeSession =
-    //        graphClient
-    //            .Watch(ExecutionStrategy.CacheFirst) // <----
-    //            .Where(t => !t.Errors.Any())
-    //            .Select(t => t.Data!.Sessions!.Nodes)
-    //            .Subscribe(result => {
-    //                items = result;
-    //                StateHasChanged();
-    //            });
-
-
-    //    var result = await graphQLClient.GetBooks.ExecuteAsync(skip, take, filter, sorter);
-    //    var count = result.Data.Books?.TotalCount ?? 0;
-    //    pagedData = result.Data.Books?.Items;
-    //    return new TableData<IGetBooks_Books_Items>() { TotalItems = count, Items = pagedData };
-
-        
-    //    isLoading = false;
-    //}
-
-    private void OnSearch(string text) {
-        var filterInput = new StringOperationFilterInput();
-        filterInput.Contains = text;
-        filter.Title = filterInput;
+    async void PageSizeChanged(int pageSize) 
+    {
+        take = pageSize;
+        itemsGrid.Reset(true);
+        await itemsGrid.FirstPage(true);
     }
 }
