@@ -95,6 +95,7 @@
             {
                 order.GetType().GetProperty(args.Column.Title).SetValue(order, SortEnumType.Asc, null);
             }
+            itemsGrid.Reset(true);
             await itemsGrid.FirstPage(true);
         }
     }
@@ -103,6 +104,9 @@
     {
         skip = args.Skip;
         take = args.Top;
+        itemsGrid.Reset(true);
+        await itemsGrid.FirstPage(true);
+
     }
 
     async void PageSizeChanged(int pageSize) 
