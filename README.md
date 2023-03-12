@@ -27,8 +27,23 @@ https://github.com/Serkan-Uslubas/Webinar_GraphQL
 
 
 **Step 1:**  Copy the content of folder "Webinar_GraphQL\01-Start" into "Webinar_GraphQL\Demo"
-
 **Step 2:**  Open DF.Webinar.GrahpQL.Backend.sln Solution with Visual Studio in the "Webinar_GraphQL\Demo" folder.
+**Step 3:**  Set the "DF.Webinar.GraphQL.DatabaseUp" Project as Startup Project
+**Step 4:**  In the "package Manager Console type:
+
+```cs
+update-database
+```
+
+**Step 4:**  Check Database:
+
+```sql
+select * from Books
+select * from Authors
+```
+![Database](Images/3.jpg)
+
+
 
 
 ## Create a new Project
