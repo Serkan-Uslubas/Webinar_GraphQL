@@ -3,7 +3,7 @@ using DF.Webinar.GraphQL.Models;
 
 namespace DF.Webinar.GraphQL.Api.Queries {
     public class BookQueries {
-        
+
         [UseOffsetPaging(IncludeTotalCount = true)]
         [UseProjection]
         [UseFiltering]

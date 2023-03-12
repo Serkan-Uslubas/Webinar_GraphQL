@@ -48,20 +48,23 @@ select * from Authors
 
 ## Create a new Project
 
-**Step 1:**  Create a new ASP.NET Core Web API project.
+**Step 1:**  Add new Project: New ASP.NET Core Web API project.
 
 **Step 2:**  Set the Project name as "DF.Webinar.GraphQL.Api" and click on the Next button.
 
 **Step 3:**  Choose .NET 7.0 and click on the Create button.
 
-**Step 4:** Add "DF.Webinar.GraphQL.Models" and "DF.Webinar.GraphQL.Database" as Project Reference.
+**Step 4:** Add Project References:
+- DF.Webinar.GraphQL.Models 
+- DF.Webinar.GraphQL.Database
 
-**Step 5:** Delete Controllers folder and WeatherForecast.cs file
+**Step 5:** If exists: Delete Controllers folder and WeatherForecast.cs file
 
 
 **Step 5:**  Install the required NuGet packages. 
 
 For that, you can use the NuGet Package Manager or the Package Manager Console. The required packages are:
+- Choose "DF.Webinar.GraphQL.Api" as default Project in Package Manager Console.
 
 ```c#
 
@@ -80,6 +83,43 @@ Install-Package Microsoft.Extensions.Configuration.Json
 
 ```
 
+**Step 6:**  Open the DF.Webinar.GraphQL.Api Project file and confirm if all packages are installed and Projects are referenced.
+
+```c#
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HotChocolate.AspNetCore" Version="13.0.5" />
+    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="10.5.5" />
+    <PackageReference Include="HotChocolate.AspNetCore.Voyager" Version="10.5.5" />
+    <PackageReference Include="HotChocolate.Data" Version="13.0.5" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="13.0.5" />
+    <PackageReference Include="HotChocolate.Types" Version="13.0.5" />
+    <PackageReference Include="HotChocolate.Types.Analyzers" Version="13.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DF.Webinar.GraphQL.Database\DF.Webinar.GraphQL.Database.csproj" />
+    <ProjectReference Include="..\DF.Webinar.GraphQL.Models\DF.Webinar.GraphQL.Models.csproj" />
+  </ItemGroup>
+
+</Project>
+
+```
 ## Create the Query Type
 
 
@@ -87,7 +127,7 @@ Install-Package Microsoft.Extensions.Configuration.Json
   
   This folder will contain all the GraphQL queries for your application.
 
-**Step 2:**  Create a new file named "BookQueries.cs" under the Queries folder. 
+**Step 2:**  Add a Class named "BookQueries.cs" under the Queries folder. 
   
   This file will contain the GraphQL queries for the Book and Author entity.
 
@@ -119,6 +159,17 @@ namespace DF.Webinar.GraphQL.Api.Queries {
 This code defines two GraphQL queries for the Book entity: GetBooks and GetBookById
 1. The **GetBooks** query retrieves all the books in the database and applies filtering and sorting  based on the GraphQL query arguments. 
 2. The **GetBookById** query retrieves a book with a specific id. 
+
+
+## Configure launchSettings.json
+
+**Step 1:** open the launchSettings.json file in the Properties folder.
+**Step 2:** set launchUrl as "graphql".
+
+
+```js
+"launchUrl": "graphql",
+```
 
 
 
@@ -197,6 +248,116 @@ app.Run();
 
 ```
 
+**Step 3:**  Set the "DF.Webinar.GraphQL.Api" Project as Startup Project
+
+## Run and Execute Queries
+
+**Step 1:**  Run the Project
+**Step 2:**  Click "Create document" and "Apply"
+**Step 3:**  Check the Schema Reference
+**Step 4:**  Execute Queries:
+
+### Simple Select
+
+
+```js
+query {
+  books {
+    items {
+      id
+      title
+      description
+    }
+  }
+}
+```
+results as
+```sql
+ Executed DbCommand (41ms) [Parameters=[@__p_0='11'], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@__p_0) [b].[Id], [b].[Title], [b].[Description]
+      FROM [Books] AS [b]
+```
+
+
+### Nested Object
+
+
+```js
+query {
+  books {
+    items {
+      id
+      title
+      description
+      author {
+        firstName
+        lastName
+      }
+    }
+  }
+}
+```
+
+
+### Skip and Take
+
+
+```js
+query {
+  books(skip: 2, take: 2) {
+    items {
+      id
+      title
+      description
+      author {
+        firstName
+        lastName
+      }
+    }
+  }
+}
+
+```
+
+### Filtering
+
+
+```js
+query {
+  books(where: { title: { contains: "Domain" } }) {
+    items {
+      id
+      title
+      description
+      author {
+        firstName
+        lastName
+      }
+    }
+  }
+}
+
+```
+### Ordering
+
+
+```js
+
+query {
+  books(order: { title: ASC}) {
+    items {
+      id
+      title
+      description
+      author {
+        firstName
+        lastName
+      }
+    }
+  }
+}
+
+```
 # Session 2: Create a Blazor Webassamybly Application wich Consumes GraphQL 
 
 

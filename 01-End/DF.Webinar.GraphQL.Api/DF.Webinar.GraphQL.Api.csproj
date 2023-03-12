@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DF.Webinar.GraphQL.Database\DF.Webinar.GraphQL.Database.csproj" />
+    <ProjectReference Include="..\DF.Webinar.GraphQL.Models\DF.Webinar.GraphQL.Models.csproj" />
   </ItemGroup>
 
 </Project>
